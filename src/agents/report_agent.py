@@ -3,7 +3,13 @@ import json
 import textwrap
 from typing import Any, Dict, List
 
-import ollama
+try:
+    import ollama  # type: ignore
+
+    _ollama_available = True
+except Exception:
+    ollama = None
+    _ollama_available = False
 
 
 class ReportAgent:
@@ -118,6 +124,9 @@ INSTRUCTIONS FOR YOUR ANSWER:
 """
 
             try:
+                if not _ollama_available:
+                    raise RuntimeError("ollama is not installed")
+
                 response = ollama.chat(
                     model="llama3.1:8b",
                     messages=[{"role": "user", "content": textwrap.dedent(prompt).strip()}],
